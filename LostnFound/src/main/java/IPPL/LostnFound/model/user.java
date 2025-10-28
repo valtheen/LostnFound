@@ -1,12 +1,9 @@
-package com.lostnfound.model;
+package IPPL.LostnFound.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
 
 @Entity
+@Table(name = "users")
 public class User {
 
     @Id
@@ -19,12 +16,13 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
     private String role;
 
+    // Constructors
     public User() {
     }
 
@@ -35,6 +33,7 @@ public class User {
         this.role = role;
     }
 
+    // Getters and Setters
     public Long getId() {
         return id;
     }
