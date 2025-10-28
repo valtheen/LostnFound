@@ -1,11 +1,15 @@
-package com.lostnfound.repository;
+package IPPL.LostnFound.repository;
 
-import com.lostnfound.model.User;
+import IPPL.LostnFound.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
-public interface UserRepository extends JpaRepository<User, String> {
-    User findByEmail(String email);
-    User findByNoHP(String noHP);
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByEmail(String email);
+    Optional<User> findByUsername(String username);
+    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
 }
