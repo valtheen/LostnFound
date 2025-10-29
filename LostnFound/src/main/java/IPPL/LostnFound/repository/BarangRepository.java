@@ -8,3 +8,4 @@ import org.springframework.stereotype.Repository;
 public interface BarangRepository extends JpaRepository<Barang, Long> {
     Barang findByNama(String nama);
 }
+ 
