@@ -1,45 +1,34 @@
-package IPPL.LostnFound.model;
+package IPPL.LostnFound.dto;
 
-import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-@Entity
-@Table(name = "users")
-public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false, unique = true)
+public class RegisterRequest {
+    
+    @NotBlank(message = "Username is required")
+    @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters")
     private String username;
-
-    @Column(nullable = false)
+    
+    @NotBlank(message = "Password is required")
+    @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
-
-    @Column(nullable = false, unique = true)
+    
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email should be valid")
     private String email;
-
-    @Column(nullable = false)
+    
+    @NotBlank(message = "Role is required")
     private String role;
 
-    // Constructors
-    public User() {
+    public RegisterRequest() {
     }
 
-    public User(String username, String password, String email, String role) {
+    public RegisterRequest(String username, String password, String email, String role) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.role = role;
-    }
-
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getUsername() {
