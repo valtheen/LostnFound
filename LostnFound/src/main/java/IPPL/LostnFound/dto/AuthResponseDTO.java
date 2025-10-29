@@ -1,39 +1,40 @@
-package IPPL.LostnFound.model;
+package IPPL.LostnFound.dto;
 
-import jakarta.persistence.*;
-
-@Entity
-@Table(name = "users")
-public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class AuthResponseDTO {
+    private String token;
+    private String type = "Bearer";
     private Long id;
-
-    @Column(nullable = false, unique = true)
     private String username;
-
-    @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false, unique = true)
     private String email;
-
-    @Column(nullable = false)
     private String role;
 
-    // Constructors
-    public User() {
+    public AuthResponseDTO() {
     }
 
-    public User(String username, String password, String email, String role) {
+    public AuthResponseDTO(String token, Long id, String username, String email, String role) {
+        this.token = token;
+        this.id = id;
         this.username = username;
-        this.password = password;
         this.email = email;
         this.role = role;
     }
 
-    // Getters and Setters
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public Long getId() {
         return id;
     }
@@ -48,14 +49,6 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getEmail() {

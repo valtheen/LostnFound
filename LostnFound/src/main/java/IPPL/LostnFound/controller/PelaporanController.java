@@ -1,5 +1,7 @@
 package IPPL.LostnFound.controller;
 
+import IPPL.LostnFound.dto.ApiResponse;
+import IPPL.LostnFound.dto.ItemReportDTO;
 import IPPL.LostnFound.model.ItemReport;
 import IPPL.LostnFound.model.User;
 import IPPL.LostnFound.repository.ItemReportRepository;
@@ -15,10 +17,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/pelaporan")
@@ -34,7 +36,7 @@ public class PelaporanController {
     private static final String UPLOAD_DIR = "uploads/";
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createReport(
+    public ResponseEntity<ApiResponse> createReport(
             @RequestParam("namaBarang") String namaBarang,
             @RequestParam("tanggal") String tanggal,
             @RequestParam("keterangan") String keterangan,
@@ -43,8 +45,6 @@ public class PelaporanController {
             @RequestParam("noHandphone") String noHandphone,
             @RequestParam(value = "gambarBarang", required = false) MultipartFile gambarBarang,
             @RequestHeader(value = "Authorization", required = false) String token) {
-        
-        Map<String, Object> response = new HashMap<>();
         
         try {
             // Extract user ID from token
@@ -89,41 +89,51 @@ public class PelaporanController {
             }
             
             ItemReport savedReport = itemReportRepository.save(itemReport);
+            ItemReportDTO responseDTO = convertToDTO(savedReport);
             
-            response.put("success", true);
-            response.put("message", "Report submitted successfully");
-            response.put("data", Map.of(
-                "id", savedReport.getId(),
-                "namaBarang", savedReport.getNamaBarang(),
-                "keterangan", savedReport.getKeterangan()
-            ));
-            
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(ApiResponse.success("Report submitted successfully", responseDTO));
             
         } catch (IOException e) {
-            response.put("success", false);
-            response.put("message", "File upload failed: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error("File upload failed: " + e.getMessage()));
         } catch (Exception e) {
-            response.put("success", false);
-            response.put("message", "Failed to create report: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error("Failed to create report: " + e.getMessage()));
         }
     }
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getAllReports() {
-        Map<String, Object> response = new HashMap<>();
-        
+    public ResponseEntity<ApiResponse> getAllReports() {
         try {
-            var reports = itemReportRepository.findAllOrderByTanggalDesc();
-            response.put("success", true);
-            response.put("data", reports);
-            return ResponseEntity.ok(response);
+            List<ItemReport> reports = itemReportRepository.findAllOrderByTanggalDesc();
+            List<ItemReportDTO> reportDTOs = reports.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(ApiResponse.success("Reports fetched successfully", reportDTOs));
         } catch (Exception e) {
-            response.put("success", false);
-            response.put("message", "Failed to fetch reports: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error("Failed to fetch reports: " + e.getMessage()));
         }
+    }
+
+    // Helper method to convert Entity to DTO
+    private ItemReportDTO convertToDTO(ItemReport itemReport) {
+        ItemReportDTO dto = new ItemReportDTO();
+        dto.setId(itemReport.getId());
+        dto.setNamaBarang(itemReport.getNamaBarang());
+        dto.setTanggal(itemReport.getTanggal());
+        dto.setKeterangan(itemReport.getKeterangan());
+        dto.setNamaPemilik(itemReport.getNamaPemilik());
+        dto.setLokasi(itemReport.getLokasi());
+        dto.setNoHandphone(itemReport.getNoHandphone());
+        dto.setGambarPath(itemReport.getGambarPath());
+        
+        if (itemReport.getUser() != null) {
+            dto.setUserId(itemReport.getUser().getId());
+            dto.setUserEmail(itemReport.getUser().getEmail());
+        }
+        
+        return dto;
     }
 }
