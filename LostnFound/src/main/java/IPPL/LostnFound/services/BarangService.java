@@ -22,38 +22,42 @@ public class BarangService {
         return barangRepository.findById(id);
     }
 
-    public List<Barang> getBarangByStatus(boolean statusHilang) {
-        return barangRepository.findByStatusHilang(statusHilang);
-    }
-
-    public List<Barang> getBarangByKategori(String kategori) {
-        return barangRepository.findByKategori(kategori);
-    }
-
-    public List<Barang> searchBarang(String keyword) {
-        return barangRepository.findByNamaContainingIgnoreCase(keyword);
-    }
-
     public Barang createBarang(Barang barang) {
         return barangRepository.save(barang);
     }
 
     public Barang updateBarang(Long id, Barang barangDetails) {
-        Optional<Barang> barangOpt = barangRepository.findById(id);
-        if (barangOpt.isPresent()) {
-            Barang barang = barangOpt.get();
-            barang.setNama(barangDetails.getNama());
-            barang.setKategori(barangDetails.getKategori());
-            barang.setDeskripsi(barangDetails.getDeskripsi());
-            barang.setStatusHilang(barangDetails.isStatusHilang());
-            barang.setLokasiTerakhir(barangDetails.getLokasiTerakhir());
-            return barangRepository.save(barang);
-        }
-        return null;
+        Barang barang = barangRepository.findById(id).orElseThrow(() -> new RuntimeException("Barang not found"));
+        barang.setNama(barangDetails.getNama());
+        barang.setKategori(barangDetails.getKategori());
+        barang.setDeskripsi(barangDetails.getDeskripsi());
+        barang.setStatusHilang(barangDetails.isStatusHilang());
+        barang.setLokasiTerakhir(barangDetails.getLokasiTerakhir());
+        return barangRepository.save(barang);
     }
 
     public void deleteBarang(Long id) {
         barangRepository.deleteById(id);
+    }
+
+    public List<Barang> findByNamaBarang(String namaBarang) {
+        return barangRepository.findByNamaContainingIgnoreCase(namaBarang);
+    }
+
+    public List<Barang> findByKategori(String kategori) {
+        return barangRepository.findByKategori(kategori);
+    }
+
+    public List<Barang> findByStatusHilang(boolean statusHilang) {
+        return barangRepository.findByStatusHilang(statusHilang);
+    }
+
+    public List<Barang> getBarangByStatus(boolean statusHilang) {
+        return barangRepository.findByStatusHilang(statusHilang);
+    }
+
+    public List<Barang> searchBarang(String keyword) {
+        return barangRepository.findByNamaContainingIgnoreCase(keyword);
     }
 
     public long countBarang() {

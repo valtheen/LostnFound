@@ -80,10 +80,26 @@ public class AuthController {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            // Find user by username
-            User user = userService.getUserByUsername(loginRequest.getUsername()).orElse(null);
+            // Find user by email (since frontend sends email as username)
+            User user = userService.findByEmail(loginRequest.getUsername());
             
-            if (user == null || !passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+            if (user == null) {
+                response.put("success", false);
+                response.put("message", "Invalid username or password");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+            
+            // Check password - handle both encrypted and plain text passwords
+            boolean passwordMatches = false;
+            if (user.getPassword().startsWith("$2a$") || user.getPassword().startsWith("$2b$")) {
+                // Password is encrypted, use passwordEncoder
+                passwordMatches = passwordEncoder.matches(loginRequest.getPassword(), user.getPassword());
+            } else {
+                // Password is plain text, compare directly
+                passwordMatches = loginRequest.getPassword().equals(user.getPassword());
+            }
+            
+            if (!passwordMatches) {
                 response.put("success", false);
                 response.put("message", "Invalid username or password");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
