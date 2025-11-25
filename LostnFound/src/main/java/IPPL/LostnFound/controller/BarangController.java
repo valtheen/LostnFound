@@ -1,30 +1,25 @@
 package IPPL.LostnFound.controller;
 
 import IPPL.LostnFound.model.ItemReport;
-import IPPL.LostnFound.model.User;
 import IPPL.LostnFound.repository.ItemReportRepository;
-import IPPL.LostnFound.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/barang")
 @CrossOrigin(origins = "http://localhost:3000")
 public class BarangController {
 
-    @Autowired
-    private ItemReportRepository itemReportRepository;
+    private final ItemReportRepository itemReportRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    public BarangController(ItemReportRepository itemReportRepository) {
+        this.itemReportRepository = itemReportRepository;
+    }
 
     @GetMapping
     public ResponseEntity<Map<String, Object>> getAllItems() {

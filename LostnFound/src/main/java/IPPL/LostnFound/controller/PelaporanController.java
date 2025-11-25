@@ -4,9 +4,9 @@ import IPPL.LostnFound.model.ItemReport;
 import IPPL.LostnFound.model.User;
 import IPPL.LostnFound.repository.ItemReportRepository;
 import IPPL.LostnFound.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,19 +17,21 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/pelaporan")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"})
 public class PelaporanController {
 
-    @Autowired
-    private ItemReportRepository itemReportRepository;
+    private final ItemReportRepository itemReportRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public PelaporanController(ItemReportRepository itemReportRepository, UserRepository userRepository) {
+        this.itemReportRepository = itemReportRepository;
+        this.userRepository = userRepository;
+    }
 
     private static final String UPLOAD_DIR = "uploads/";
 
@@ -42,26 +44,25 @@ public class PelaporanController {
             @RequestParam("lokasi") String lokasi,
             @RequestParam("noHandphone") String noHandphone,
             @RequestParam(value = "gambarBarang", required = false) MultipartFile gambarBarang,
-            @RequestHeader(value = "Authorization", required = false) String token) {
+            Authentication authentication) {
         
         Map<String, Object> response = new HashMap<>();
         
+        if (authentication == null || !authentication.isAuthenticated() ||
+                "anonymousUser".equals(authentication.getPrincipal())) {
+            response.put("success", false);
+            response.put("message", "Authorization token required");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
         try {
-            // Extract user ID from token
-            Long userId = null;
-            if (token != null && token.startsWith("Bearer ")) {
-                try {
-                    String userIdStr = token.replace("Bearer jwt-token-", "");
-                    userId = Long.parseLong(userIdStr);
-                } catch (NumberFormatException e) {
-                    // Invalid token format, continue without user
-                }
-            }
-            
-            User user = null;
-            if (userId != null) {
-                Optional<User> userOpt = userRepository.findById(userId);
-                user = userOpt.orElse(null);
+            User user = userRepository.findByEmail(authentication.getName())
+                    .orElse(null);
+
+            if (user == null) {
+                response.put("success", false);
+                response.put("message", "User tidak ditemukan");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
             
             // Create new item report
@@ -90,7 +91,7 @@ public class PelaporanController {
             
             ItemReport savedReport = itemReportRepository.save(itemReport);
             
-            response.put("success", true);
+                response.put("success", true);
             response.put("message", "Report submitted successfully");
             response.put("data", Map.of(
                 "id", savedReport.getId(),
