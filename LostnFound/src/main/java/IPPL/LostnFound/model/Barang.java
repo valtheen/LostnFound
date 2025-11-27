@@ -3,82 +3,86 @@ package IPPL.LostnFound.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "barang")
 public class Barang {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
 
-	@Column(nullable = false)
-	private String nama;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@Column(nullable = false)
-	private String kategori;
+    @Column(nullable = false)
+    private String nama;
 
-	@Column(columnDefinition = "TEXT")
-	private String deskripsi;
+    @Column(nullable = false)
+    private String kategori;
 
-	@Column(nullable = false)
-	private boolean statusHilang;
+    @Column(columnDefinition = "TEXT")
+    private String deskripsi;
 
-	@Column(nullable = false)
-	private String lokasiTerakhir;
+    @Column(nullable = false)
+    private boolean statusHilang;
 
-	public Barang() {
-	}
+    @Column(nullable = false)
+    private String lokasiTerakhir;
 
-	public Barang(String nama, String kategori, String deskripsi, boolean statusHilang, String lokasiTerakhir) {
-		this.nama = nama;
-		this.kategori = kategori;
-		this.deskripsi = deskripsi;
-		this.statusHilang = statusHilang;
-		this.lokasiTerakhir = lokasiTerakhir;
-	}
+    // Constructors
+    public Barang() {
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Barang(String nama, String kategori, String deskripsi, boolean statusHilang, String lokasiTerakhir) {
+        this.nama = nama;
+        this.kategori = kategori;
+        this.deskripsi = deskripsi;
+        this.statusHilang = statusHilang;
+        this.lokasiTerakhir = lokasiTerakhir;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
 
-	public String getNama() {
-		return nama;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setNama(String nama) {
-		this.nama = nama;
-	}
+    public String getNama() {
+        return nama;
+    }
 
-	public String getKategori() {
-		return kategori;
-	}
+    public void setNama(String nama) {
+        this.nama = nama;
+    }
 
-	public void setKategori(String kategori) {
-		this.kategori = kategori;
-	}
+    public String getKategori() {
+        return kategori;
+    }
 
-	public String getDeskripsi() {
-		return deskripsi;
-	}
+    public void setKategori(String kategori) {
+        this.kategori = kategori;
+    }
 
-	public void setDeskripsi(String deskripsi) {
-		this.deskripsi = deskripsi;
-	}
+    public String getDeskripsi() {
+        return deskripsi;
+    }
 
-	public boolean isStatusHilang() {
-		return statusHilang;
-	}
+    public void setDeskripsi(String deskripsi) {
+        this.deskripsi = deskripsi;
+    }
 
-	public void setStatusHilang(boolean statusHilang) {
-		this.statusHilang = statusHilang;
-	}
+    public boolean isStatusHilang() {
+        return statusHilang;
+    }
 
-	public String getLokasiTerakhir() {
-		return lokasiTerakhir;
-	}
+    public void setStatusHilang(boolean statusHilang) {
+        this.statusHilang = statusHilang;
+    }
 
-	public void setLokasiTerakhir(String lokasiTerakhir) {
-		this.lokasiTerakhir = lokasiTerakhir;
-	}
+    public String getLokasiTerakhir() {
+        return lokasiTerakhir;
+    }
+
+    public void setLokasiTerakhir(String lokasiTerakhir) {
+        this.lokasiTerakhir = lokasiTerakhir;
+    }
 }
