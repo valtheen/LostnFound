@@ -1,76 +1,88 @@
 package IPPL.LostnFound.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
 public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String username;
+	@Column(nullable = false)
+	private String name;
 
-    @Column(nullable = false)
-    private String password;
+	@Column(nullable = false, unique = true)
+	private String email;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+	@Column(nullable = false, unique = true)
+	private String phone;
 
-    @Column(nullable = false)
-    private String role;
+	@JsonIgnore
+	@Column(nullable = false)
+	private String password;
 
-    // Constructors
-    public User() {
-    }
+	@Column(nullable = false)
+	private String role = "USER";
 
-    public User(String username, String password, String email, String role) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.role = role;
-    }
+	public User() {
+	}
 
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
+	public User(String name, String email, String phone, String password, String role) {
+		this.name = name;
+		this.email = email;
+		this.phone = phone;
+		this.password = password;
+		this.role = role;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public String getUsername() {
-        return username;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String getPassword() {
-        return password;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+	public String getEmail() {
+		return email;
+	}
 
-    public String getEmail() {
-        return email;
-    }
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+	public String getPhone() {
+		return phone;
+	}
 
-    public String getRole() {
-        return role;
-    }
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
 
-    public void setRole(String role) {
-        this.role = role;
-    }
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
 }

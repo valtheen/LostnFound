@@ -1,56 +1,19 @@
-package IPPL.LostnFound.model;
+package IPPL.LostnFound.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "item_reports")
-public class ItemReport {
+public class ItemReportDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
     private String namaBarang;
-
-    @Column(nullable = false)
     private LocalDate tanggal;
-
-    @Column(nullable = false)
-    private String keterangan; // "Hilang" or "Ditemukan"
-
-    @Column(nullable = false)
+    private String keterangan;
     private String namaPemilik;
-
-    @Column(nullable = false)
     private String lokasi;
-
-    @Column(nullable = false)
     private String noHandphone;
-
-    @Column(columnDefinition = "TEXT")
     private String gambarPath;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    @JsonIgnore
-    private User user;
-
-    public ItemReport() {
-    }
-
-    public ItemReport(String namaBarang, LocalDate tanggal, String keterangan,
-                      String namaPemilik, String lokasi, String noHandphone, User user) {
-        this.namaBarang = namaBarang;
-        this.tanggal = tanggal;
-        this.keterangan = keterangan;
-        this.namaPemilik = namaPemilik;
-        this.lokasi = lokasi;
-        this.noHandphone = noHandphone;
-        this.user = user;
-    }
+    private Long userId;
+    private String userEmail;
 
     public Long getId() {
         return id;
@@ -116,11 +79,19 @@ public class ItemReport {
         this.gambarPath = gambarPath;
     }
 
-    public User getUser() {
-        return user;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 }

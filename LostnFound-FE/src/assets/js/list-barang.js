@@ -39,7 +39,7 @@ async function loadItems() {
     try {
         const token = localStorage.getItem('token');
         
-        const response = await fetch(`${API_BASE_URL}/barang`, {
+        const response = await fetch(`${API_BASE_URL}/pelaporan`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -49,10 +49,16 @@ async function loadItems() {
         
         if (response.ok) {
             const result = await response.json();
-            allItems = result.data || [];
-            filteredItems = [...allItems];
-            renderTable();
-            renderPagination();
+            if (result.success && result.data) {
+                allItems = Array.isArray(result.data) ? result.data : [];
+                filteredItems = [...allItems];
+                renderTable();
+                renderPagination();
+            } else {
+                console.error('Failed to load items:', result.message);
+                // Fallback to localStorage for demo
+                loadFromLocalStorage();
+            }
         } else {
             console.error('Failed to load items');
             // Fallback to localStorage for demo
@@ -195,8 +201,13 @@ function setupSearch() {
 }
 
 function viewImage(itemId) {
-    // This would typically open a modal or navigate to a detail page
-    alert('Image viewer functionality will be implemented soon.');
+    const item = allItems.find(i => i.id == itemId);
+    if (item && item.gambarPath) {
+        const imageUrl = `http://localhost:8080/uploads/${item.gambarPath}`;
+        window.open(imageUrl, '_blank');
+    } else {
+        alert('No image available for this item.');
+    }
 }
 
 function toggleSelection(itemId) {

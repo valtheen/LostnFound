@@ -56,8 +56,12 @@ async function loadStats() {
         });
         
         if (response.ok) {
-            const stats = await response.json();
-            updateStatsDisplay(stats);
+            const result = await response.json();
+            if (result.success) {
+                updateStatsDisplay(result);
+            } else {
+                throw new Error(result.message || 'Failed to load stats');
+            }
         } else {
             throw new Error('Failed to load stats');
         }
@@ -99,8 +103,12 @@ async function loadRecentActivity() {
         });
         
         if (response.ok) {
-            const activities = await response.json();
-            renderRecentActivity(activities);
+            const result = await response.json();
+            if (result.success && result.data) {
+                renderRecentActivity(result.data);
+            } else {
+                throw new Error(result.message || 'Failed to load recent activity');
+            }
         } else {
             throw new Error('Failed to load recent activity');
         }
@@ -131,12 +139,27 @@ function renderRecentActivity(activities) {
     
     activityListElement.innerHTML = '';
     
-    if (activities.length === 0) {
+    if (!activities || activities.length === 0) {
         activityListElement.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 20px;">No recent activity</p>';
         return;
     }
     
-    activities.forEach(activity => {
+    // Convert backend format to frontend format if needed
+    const formattedActivities = activities.map(activity => {
+        if (activity.namaBarang) {
+            // Backend format - convert to frontend format
+            return {
+                id: activity.id || Math.random().toString(36).substr(2, 9),
+                type: activity.keterangan && activity.keterangan.toLowerCase() === 'hilang' ? 'lost' : 'found',
+                title: `${activity.keterangan === 'Hilang' ? 'Lost' : 'Found'}: ${activity.namaBarang}`,
+                description: `Reported by ${activity.namaPemilik || 'Unknown'} at ${activity.lokasi || 'Unknown location'}`,
+                time: activity.tanggal || new Date().toISOString().split('T')[0]
+            };
+        }
+        return activity; // Already in frontend format
+    });
+    
+    formattedActivities.forEach(activity => {
         const activityItem = createActivityItem(activity);
         activityListElement.appendChild(activityItem);
     });

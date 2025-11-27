@@ -47,12 +47,20 @@ signupForm.addEventListener('submit', async function(event) {
     event.preventDefault();
     
     const formData = new FormData(signupForm);
+    const password = formData.get('password');
+    const confirmPassword = formData.get('confirmPassword');
+    
+    // Check if passwords match
+    if (password !== confirmPassword) {
+        alert('Passwords do not match. Please try again.');
+        return;
+    }
+    
     const userData = {
-        email: formData.get('email'),
         name: formData.get('name'),
+        email: formData.get('email'),
         phone: formData.get('phone'),
-        password: formData.get('password'),
-        confirmPassword: formData.get('confirmPassword')
+        password: password
     };
 
     // Client-side validation
@@ -61,7 +69,7 @@ signupForm.addEventListener('submit', async function(event) {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/users/register`, {
+        const response = await fetch(`${API_BASE_URL}/auth/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -71,7 +79,7 @@ signupForm.addEventListener('submit', async function(event) {
 
         const result = await response.json();
 
-        if (response.ok) {
+        if (response.ok && result.success) {
             alert('Sign up successful! Please login.');
             window.location.href = 'login.html';
         } else {
@@ -85,6 +93,7 @@ signupForm.addEventListener('submit', async function(event) {
 
 function validateForm(data) {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phonePattern = /^\d{10,13}$/;
     
     if (!emailPattern.test(data.email)) {
         alert("Please enter a valid email address.");
@@ -96,18 +105,13 @@ function validateForm(data) {
         return false;
     }
     
-    if (!/^\d{10,13}$/.test(data.phone)) {
-        alert("Please enter a valid phone number (10-13 digits).");
+    if (!phonePattern.test(data.phone)) {
+        alert("Phone number must be 10-13 digits.");
         return false;
     }
     
     if (data.password.length < 6) {
         alert("Password must be at least 6 characters long.");
-        return false;
-    }
-    
-    if (data.password !== data.confirmPassword) {
-        alert("Passwords do not match.");
         return false;
     }
     

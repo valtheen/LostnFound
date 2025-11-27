@@ -47,7 +47,7 @@ loginForm.addEventListener('submit', async function(event) {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/users/login`, {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ loginForm.addEventListener('submit', async function(event) {
 
         const result = await response.json();
 
-        if (response.ok) {
+        if (response.ok && result.success) {
             // Store user data in localStorage
             localStorage.setItem('user', JSON.stringify(result.user));
             localStorage.setItem('token', result.token);
