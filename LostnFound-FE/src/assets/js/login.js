@@ -37,7 +37,7 @@ loginForm.addEventListener('submit', async function(event) {
     
     const formData = new FormData(loginForm);
     const loginData = {
-        username: formData.get('email'),
+        email: formData.get('email'),
         password: formData.get('password')
     };
 
@@ -57,10 +57,10 @@ loginForm.addEventListener('submit', async function(event) {
 
         const result = await response.json();
 
-        if (response.ok) {
+        if (response.ok && result.success) {
             // Store user data in localStorage
-            localStorage.setItem('user', JSON.stringify(result.data));
-            localStorage.setItem('token', result.data.accessToken);
+            localStorage.setItem('user', JSON.stringify(result.user));
+            localStorage.setItem('token', result.token);
             
             alert('Login successful!');
             window.location.href = 'dashboard.html';
@@ -74,8 +74,10 @@ loginForm.addEventListener('submit', async function(event) {
 });
 
 function validateLoginForm(data) {
-    if (data.username.length < 2) {
-        alert("Please enter a valid username.");
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (!emailPattern.test(data.email)) {
+        alert("Please enter a valid email address.");
         return false;
     }
     

@@ -47,11 +47,20 @@ signupForm.addEventListener('submit', async function(event) {
     event.preventDefault();
     
     const formData = new FormData(signupForm);
+    const password = formData.get('password');
+    const confirmPassword = formData.get('confirmPassword');
+    
+    // Check if passwords match
+    if (password !== confirmPassword) {
+        alert('Passwords do not match. Please try again.');
+        return;
+    }
+    
     const userData = {
-        username: formData.get('name'),
+        name: formData.get('name'),
         email: formData.get('email'),
-        password: formData.get('password'),
-        role: 'USER'
+        phone: formData.get('phone'),
+        password: password
     };
 
     // Client-side validation
@@ -70,7 +79,7 @@ signupForm.addEventListener('submit', async function(event) {
 
         const result = await response.json();
 
-        if (response.ok) {
+        if (response.ok && result.success) {
             alert('Sign up successful! Please login.');
             window.location.href = 'login.html';
         } else {
@@ -84,14 +93,20 @@ signupForm.addEventListener('submit', async function(event) {
 
 function validateForm(data) {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phonePattern = /^\d{10,13}$/;
     
     if (!emailPattern.test(data.email)) {
         alert("Please enter a valid email address.");
         return false;
     }
     
-    if (data.username.length < 2) {
-        alert("Username must be at least 2 characters long.");
+    if (data.name.length < 2) {
+        alert("Name must be at least 2 characters long.");
+        return false;
+    }
+    
+    if (!phonePattern.test(data.phone)) {
+        alert("Phone number must be 10-13 digits.");
         return false;
     }
     
