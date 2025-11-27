@@ -1,14 +1,15 @@
 package IPPL.LostnFound.config;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.Date;
 
 @Component
@@ -20,7 +21,7 @@ public class JWTGenerator {
     @Value("${app.security.jwt.expiration-in-ms:86400000}")
     private long jwtExpirationInMs;
 
-    private Key signingKey;
+    private SecretKey signingKey;
 
     @PostConstruct
     public void init() {
@@ -33,39 +34,33 @@ public class JWTGenerator {
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
         return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(signingKey, SignatureAlgorithm.HS256)
+                .subject(username)
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(signingKey)
                 .compact();
     }
 
     public String getUsernameFromJWT(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(signingKey)
+        Claims claims = Jwts.parser()
+                .verifyWith(signingKey)
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
 
         return claims.getSubject();
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(signingKey)
+            Jwts.parser()
+                    .verifyWith(signingKey)
                     .build()
-                    .parseClaimsJws(token);
+                    .parseSignedClaims(token);
             return true;
 
-        } catch (MalformedJwtException e) {
-            System.out.println("Invalid JWT token");
-        } catch (ExpiredJwtException e) {
-            System.out.println("Expired JWT token");
-        } catch (UnsupportedJwtException e) {
-            System.out.println("Unsupported JWT token");
-        } catch (IllegalArgumentException e) {
-            System.out.println("JWT claims string is empty");
+        } catch (RuntimeException e) {
+            System.out.println("Invalid JWT token: " + e.getMessage());
         }
 
         return false;

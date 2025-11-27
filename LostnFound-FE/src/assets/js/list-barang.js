@@ -39,7 +39,7 @@ async function loadItems() {
     try {
         const token = localStorage.getItem('token');
         
-        const response = await fetch(`${API_BASE_URL}/barang`, {
+        const response = await fetch(`${API_BASE_URL}/pelaporan`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,

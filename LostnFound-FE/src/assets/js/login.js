@@ -37,7 +37,7 @@ loginForm.addEventListener('submit', async function(event) {
     
     const formData = new FormData(loginForm);
     const loginData = {
-        email: formData.get('email'),
+        username: formData.get('email'),
         password: formData.get('password')
     };
 
@@ -47,7 +47,7 @@ loginForm.addEventListener('submit', async function(event) {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/users/login`, {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -59,8 +59,8 @@ loginForm.addEventListener('submit', async function(event) {
 
         if (response.ok) {
             // Store user data in localStorage
-            localStorage.setItem('user', JSON.stringify(result.user));
-            localStorage.setItem('token', result.token);
+            localStorage.setItem('user', JSON.stringify(result.data));
+            localStorage.setItem('token', result.data.accessToken);
             
             alert('Login successful!');
             window.location.href = 'dashboard.html';
@@ -74,10 +74,8 @@ loginForm.addEventListener('submit', async function(event) {
 });
 
 function validateLoginForm(data) {
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    
-    if (!emailPattern.test(data.email)) {
-        alert("Please enter a valid email address.");
+    if (data.username.length < 2) {
+        alert("Please enter a valid username.");
         return false;
     }
     

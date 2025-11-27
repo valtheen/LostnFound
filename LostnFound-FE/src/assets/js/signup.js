@@ -48,11 +48,10 @@ signupForm.addEventListener('submit', async function(event) {
     
     const formData = new FormData(signupForm);
     const userData = {
+        username: formData.get('name'),
         email: formData.get('email'),
-        name: formData.get('name'),
-        phone: formData.get('phone'),
         password: formData.get('password'),
-        confirmPassword: formData.get('confirmPassword')
+        role: 'USER'
     };
 
     // Client-side validation
@@ -61,7 +60,7 @@ signupForm.addEventListener('submit', async function(event) {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/users/register`, {
+        const response = await fetch(`${API_BASE_URL}/auth/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -91,23 +90,13 @@ function validateForm(data) {
         return false;
     }
     
-    if (data.name.length < 2) {
-        alert("Name must be at least 2 characters long.");
-        return false;
-    }
-    
-    if (!/^\d{10,13}$/.test(data.phone)) {
-        alert("Please enter a valid phone number (10-13 digits).");
+    if (data.username.length < 2) {
+        alert("Username must be at least 2 characters long.");
         return false;
     }
     
     if (data.password.length < 6) {
         alert("Password must be at least 6 characters long.");
-        return false;
-    }
-    
-    if (data.password !== data.confirmPassword) {
-        alert("Passwords do not match.");
         return false;
     }
     

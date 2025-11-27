@@ -19,5 +19,8 @@ spring.jpa.properties.hibernate.format_sql=true
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect
 
 # Security / JWT
-app.security.jwt.secret=LostnFoundSecretKey123!@#ChangeMe
+# IMPORTANT: Change this secret key in production!
+# Generate a strong random key: openssl rand -base64 32
+app.security.jwt.secret=YOUR_SECRET_KEY_HERE_CHANGE_ME
 app.security.jwt.expiration-in-ms=86400000
+
