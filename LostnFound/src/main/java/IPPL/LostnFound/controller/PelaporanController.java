@@ -48,19 +48,14 @@ public class PelaporanController {
             @RequestParam(value = "gambarBarang", required = false) MultipartFile gambarBarang,
             Authentication authentication) {
 
-        if (authentication == null || !authentication.isAuthenticated() ||
-                "anonymousUser".equalsIgnoreCase(String.valueOf(authentication.getPrincipal()))) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponse.error("Authorization token required"));
-        }
-
         try {
-            User user = userRepository.findByEmail(authentication.getName())
-                    .orElse(null);
-
-            if (user == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(ApiResponse.error("User tidak ditemukan"));
+            User user = null;
+            
+            // Try to get user from authentication if available
+            if (authentication != null && authentication.isAuthenticated() &&
+                    !"anonymousUser".equalsIgnoreCase(String.valueOf(authentication.getPrincipal()))) {
+                user = userRepository.findByEmail(authentication.getName())
+                        .orElse(null);
             }
             
             // Create new item report
@@ -71,7 +66,7 @@ public class PelaporanController {
             itemReport.setNamaPemilik(namaPemilik);
             itemReport.setLokasi(lokasi);
             itemReport.setNoHandphone(noHandphone);
-            itemReport.setUser(user);
+            itemReport.setUser(user); // Can be null if user not authenticated
             
             // Handle file upload
             if (gambarBarang != null && !gambarBarang.isEmpty()) {
