@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pelaporan - Lost n Found</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/pelaporan.css">
+</head>
+<body>
+    <aside class="sidebar">
+        <h1 class="logo">Lost n Found</h1>
+        <div class="menu-group">
+            <p class="group-title">Menu</p>
+            <ul class="menu-list">
+                <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="list-barang.html"><i class="fas fa-list"></i> List Barang</a></li>
+                <li class="active"><a href="pelaporan.html"><i class="fas fa-book"></i> Pelaporan</a></li>
+            </ul>
+        </div>
+        <div class="menu-group">
+            <p class="group-title">General</p>
+            <ul class="menu-list">
+                <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="help.html"><i class="fas fa-question-circle"></i> Help</a></li>
+            </ul>
+        </div>
+        <div class="menu-group logout-link">
+             <ul class="menu-list">
+                <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <div class="header-left">
+            </div>
+            <div class="header-right">
+                <i class="fas fa-bell notification-bell"></i>
+                <div class="admin-profile">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="user-name">Admin</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="form-container">
+            <form id="report-form">
+                <div class="form-grid">
+                    <!-- Kolom Kiri -->
+                    <div class="form-group">
+                        <label for="nama-barang">Nama Barang</label>
+                        <input type="text" id="nama-barang" name="namaBarang" required>
+                    </div>
+                    <!-- Kolom Kanan -->
+                    <div class="form-group">
+                        <label for="tanggal">Tanggal</label>
+                        <input type="date" id="tanggal" name="tanggal" required>
+                    </div>
+                    <!-- Kolom Kiri -->
+                    <div class="form-group">
+                        <label for="keterangan">Keterangan</label>
+                        <select id="keterangan" name="keterangan" required>
+                            <option value="" disabled selected>Pilih Keterangan</option>
+                            <option value="Hilang">Hilang</option>
+                            <option value="Ditemukan">Ditemukan</option>
+                        </select>
+                    </div>
+                    <!-- Kolom Kanan -->
+                    <div class="form-group">
+                        <label for="nama-pemilik">Nama Pemilik / Penemu</label>
+                        <input type="text" id="nama-pemilik" name="namaPemilik" required>
+                    </div>
+                    <!-- Kolom Kiri -->
+                    <div class="form-group">
+                        <label for="kategori">Kategori</label>
+                        <select id="kategori" name="kategori">
+                            <option value="" disabled selected>Pilih Kategori</option>
+                            <option value="Elektronik">Elektronik</option>
+                            <option value="Pakaian">Pakaian</option>
+                            <option value="Aksesoris">Aksesoris</option>
+                            <option value="Dokumen">Dokumen</option>
+                            <option value="Kendaraan">Kendaraan</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                    <!-- Kolom Kanan -->
+                    <div class="form-group">
+                        <label for="lokasi">Lokasi</label>
+                        <input type="text" id="lokasi" name="lokasi" required>
+                    </div>
+                    <!-- Kolom Kiri -->
+                    <div class="form-group">
+                        <label for="no-handphone">No. Handphone</label>
+                        <input type="tel" id="no-handphone" name="noHandphone" required>
+                    </div>
+                    <!-- Kolom Kanan -->
+                    <div class="form-group">
+                        <label for="gambar-barang">Masukan Gambar</label>
+                        <div class="file-input-wrapper">
+                            <span id="file-name-display" class="file-placeholder">Masukan Gambar</span>
+                            <label for="gambar-barang" class="file-input-label">Pilih File</label>
+                            <input type="file" id="gambar-barang" name="gambarBarang" accept="image/*">
+                        </div>
+                    </div>
+                </div>
+                <div class="submit-button-container">
+                    <button type="submit" class="submit-btn">Submit</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <div id="success-popup" class="popup-overlay">
+        <div class="popup-content">
+            <div class="popup-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3>Terima Kasih</h3>
+            <p>Laporan Anda Sudah Kami Terima</p>
+        </div>
+    </div>
+
+    <script src="../assets/js/pelaporan.js"></script>
+</body>
+</html>

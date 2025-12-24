@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Lost n Found</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/signup.css">
+</head>
+<body>
+    <div class="container">
+        <h2>SIGN UP</h2>
+        <form id="signup-form">
+            <div class="input-group">
+                <i class="fas fa-envelope email-icon"></i>
+                <input type="email" placeholder="Enter Email" id="email" name="email" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-user user-icon"></i>
+                <input type="text" placeholder="Enter Your Name" id="name" name="name" required minlength="3" maxlength="20">
+            </div>
+            <div class="input-group">
+                <i class="fas fa-phone phone-icon"></i>
+                <input type="tel" placeholder="Enter Phone Number" id="phone" name="phone" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock password-icon"></i>
+                <input type="password" placeholder="Password" id="password" name="password" required minlength="6">
+                <i class="fas fa-eye password-toggle" onclick="toggleVisibility('password')"></i>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock password-icon"></i>
+                <input type="password" placeholder="Confirm Password" id="confirm-password" name="confirmPassword" required minlength="6">
+                <i class="fas fa-eye confirm-password-toggle" onclick="toggleVisibility('confirm-password')"></i>
+            </div>
+            <div class="terms">By signing up, you're agree to our Terms & Conditions and Privacy Policy</div>
+            <button type="submit" class="continue-btn">Continue</button>
+        </form>
+        <div class="login-link">Joined us before? <a href="login.html">Login</a></div>
+    </div>
+
+    <script src="../assets/js/signup.js"></script>
+</body>
+</html>

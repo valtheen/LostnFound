@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Lost n Found</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/login.css">
+</head>
+<body>
+    <div class="container">
+        <h2>WELCOME</h2>
+        <form id="login-form">
+            <div class="input-group">
+                <i class="fas fa-envelope email-icon"></i>
+                <input type="email" placeholder="Email" id="email" name="email" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock password-icon"></i> 
+                <input type="password" placeholder="Password" id="password" name="password" required>
+                <i class="fas fa-eye password-toggle" onclick="togglePassword()"></i>
+            </div>
+            <div class="forgot-password">Forgot Password?</div>
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+        <div class="or">OR</div>
+        <button class="google-btn" onclick="loginWithGoogle()">
+            <img src="https://www.google.com/favicon.ico" alt="Google"> Login with Google
+        </button>
+        <div class="register-link">Don't have an account? <a href="signup.html">Sign Up</a></div>
+    </div>
+
+    <script src="../assets/js/login.js"></script>
+</body>
+</html>
