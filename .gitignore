@@ -31,6 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+<<<<<<< HEAD
 
 ### Node.js ###
 node_modules/
@@ -61,3 +62,5 @@ Thumbs.db
 *.swp
 *.swo
 *~
+=======
+>>>>>>> devendev

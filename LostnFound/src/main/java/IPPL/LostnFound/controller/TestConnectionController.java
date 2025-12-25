@@ -64,9 +64,14 @@ public class TestConnectionController {
 
         try {
             User user = new User();
+<<<<<<< HEAD
             user.setName("testuser");
             user.setEmail("test@example.com");
             user.setPhone("081234567890");
+=======
+            user.setUsername("testuser");
+            user.setEmail("test@example.com");
+>>>>>>> devendev
             user.setPassword("password123");
             user.setRole("USER");
 

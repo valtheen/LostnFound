@@ -68,6 +68,14 @@ function setupFormSubmission() {
             submitData.append('tanggal', formData.get('tanggal'));
             submitData.append('keterangan', formData.get('keterangan'));
             submitData.append('namaPemilik', formData.get('namaPemilik'));
+<<<<<<< HEAD
+=======
+            
+            // Get kategori value - ensure it's sent even if empty
+            const kategoriValue = formData.get('kategori');
+            submitData.append('kategori', kategoriValue && kategoriValue.trim() !== '' ? kategoriValue : 'Umum');
+            
+>>>>>>> devendev
             submitData.append('lokasi', formData.get('lokasi'));
             submitData.append('noHandphone', formData.get('noHandphone'));
             
@@ -75,6 +83,12 @@ function setupFormSubmission() {
                 submitData.append('gambarBarang', fileInput.files[0]);
             }
             
+<<<<<<< HEAD
+=======
+            // Debug: log form data
+            console.log('Submitting form with kategori:', kategoriValue || 'Umum');
+            
+>>>>>>> devendev
             const token = localStorage.getItem('token');
             
             const response = await fetch(`${API_BASE_URL}/pelaporan`, {
@@ -85,6 +99,7 @@ function setupFormSubmission() {
                 body: submitData
             });
             
+<<<<<<< HEAD
             const result = await response.json();
             
             if (response.ok) {
@@ -95,6 +110,52 @@ function setupFormSubmission() {
         } catch (error) {
             console.error('Error:', error);
             alert('Network error. Please check your connection and try again.');
+=======
+            // Check if response is OK before parsing JSON
+            if (response.ok) {
+                let result;
+                try {
+                    result = await response.json();
+                } catch (e) {
+                    console.error('Error parsing response:', e);
+                    // If JSON parsing fails but response is OK, assume success
+                    showSuccessPopup();
+                    setTimeout(() => {
+                        window.location.href = 'list-barang.html';
+                    }, 3000);
+                    return;
+                }
+                
+                showSuccessPopup();
+                // Optionally redirect to list-barang after 3 seconds
+                setTimeout(() => {
+                    window.location.href = 'list-barang.html';
+                }, 3000);
+            } else {
+                // Try to parse error response
+                let errorMessage = 'Failed to submit report. Please try again.';
+                try {
+                    const errorResult = await response.json();
+                    errorMessage = errorResult.message || errorMessage;
+                } catch (e) {
+                    // If response is not JSON, use status text
+                    errorMessage = `Error ${response.status}: ${response.statusText || 'Server error'}`;
+                }
+                alert(errorMessage);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            let errorMessage = 'Network error. Please check your connection and try again.';
+            
+            // More specific error messages
+            if (error.message && error.message.includes('Failed to fetch')) {
+                errorMessage = 'Tidak dapat terhubung ke server. Pastikan backend sudah berjalan di http://localhost:8080';
+            } else if (error.message) {
+                errorMessage = `Error: ${error.message}`;
+            }
+            
+            alert(errorMessage);
+>>>>>>> devendev
         }
     });
 }

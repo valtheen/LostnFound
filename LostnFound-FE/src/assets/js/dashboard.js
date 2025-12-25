@@ -47,7 +47,11 @@ async function loadStats() {
     try {
         const token = localStorage.getItem('token');
         
+<<<<<<< HEAD
         const response = await fetch(`${API_BASE_URL}/barang/stats`, {
+=======
+        const response = await fetch(`${API_BASE_URL}/pelaporan/stats`, {
+>>>>>>> devendev
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -57,10 +61,17 @@ async function loadStats() {
         
         if (response.ok) {
             const result = await response.json();
+<<<<<<< HEAD
             if (result.success) {
                 updateStatsDisplay(result);
             } else {
                 throw new Error(result.message || 'Failed to load stats');
+=======
+            if (result.success && result.data) {
+                updateStatsDisplay(result.data);
+            } else {
+                throw new Error('Invalid response format');
+>>>>>>> devendev
             }
         } else {
             throw new Error('Failed to load stats');
@@ -94,7 +105,11 @@ async function loadRecentActivity() {
     try {
         const token = localStorage.getItem('token');
         
+<<<<<<< HEAD
         const response = await fetch(`${API_BASE_URL}/barang/recent`, {
+=======
+        const response = await fetch(`${API_BASE_URL}/pelaporan/recent?limit=5`, {
+>>>>>>> devendev
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -105,9 +120,22 @@ async function loadRecentActivity() {
         if (response.ok) {
             const result = await response.json();
             if (result.success && result.data) {
+<<<<<<< HEAD
                 renderRecentActivity(result.data);
             } else {
                 throw new Error(result.message || 'Failed to load recent activity');
+=======
+                const activities = result.data.map(item => ({
+                    id: item.id,
+                    type: item.keterangan === 'Hilang' ? 'lost' : 'found',
+                    title: `${item.keterangan === 'Hilang' ? 'Lost' : 'Found'}: ${item.namaBarang}`,
+                    description: `Reported by ${item.namaPemilik} at ${item.lokasi}`,
+                    time: item.tanggal || new Date().toISOString().split('T')[0]
+                }));
+                renderRecentActivity(activities);
+            } else {
+                throw new Error('Invalid response format');
+>>>>>>> devendev
             }
         } else {
             throw new Error('Failed to load recent activity');
@@ -139,11 +167,16 @@ function renderRecentActivity(activities) {
     
     activityListElement.innerHTML = '';
     
+<<<<<<< HEAD
     if (!activities || activities.length === 0) {
+=======
+    if (activities.length === 0) {
+>>>>>>> devendev
         activityListElement.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 20px;">No recent activity</p>';
         return;
     }
     
+<<<<<<< HEAD
     // Convert backend format to frontend format if needed
     const formattedActivities = activities.map(activity => {
         if (activity.namaBarang) {
@@ -160,6 +193,9 @@ function renderRecentActivity(activities) {
     });
     
     formattedActivities.forEach(activity => {
+=======
+    activities.forEach(activity => {
+>>>>>>> devendev
         const activityItem = createActivityItem(activity);
         activityListElement.appendChild(activityItem);
     });

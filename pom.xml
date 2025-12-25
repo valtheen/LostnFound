@@ -94,7 +94,10 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+<<<<<<< HEAD
 
+=======
+>>>>>>> devendev
 	</dependencies>
 
 	<build>

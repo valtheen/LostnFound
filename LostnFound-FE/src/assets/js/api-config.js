@@ -14,6 +14,11 @@ const API_CONFIG = {
         
         // Reports
         REPORTS: '/pelaporan',
+<<<<<<< HEAD
+=======
+        REPORT_STATS: '/pelaporan/stats',
+        RECENT_REPORTS: '/pelaporan/recent',
+>>>>>>> devendev
         
         // Users
         USER_PROFILE: '/users/profile',

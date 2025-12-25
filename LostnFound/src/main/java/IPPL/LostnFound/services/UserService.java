@@ -28,9 +28,14 @@ public class UserService {
 
     public User updateUser(Long id, User userDetails) {
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+<<<<<<< HEAD
         user.setName(userDetails.getName());
         user.setEmail(userDetails.getEmail());
         user.setPhone(userDetails.getPhone());
+=======
+        user.setUsername(userDetails.getUsername());
+        user.setEmail(userDetails.getEmail());
+>>>>>>> devendev
         user.setRole(userDetails.getRole());
         return userRepository.save(user);
     }
@@ -43,15 +48,31 @@ public class UserService {
         return userRepository.findByEmail(email).orElse(null);
     }
 
+<<<<<<< HEAD
     public User findByPhone(String phone) {
         return userRepository.findByPhone(phone).orElse(null);
     }
 
     public boolean existsByPhone(String phone) {
         return userRepository.existsByPhone(phone);
+=======
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElse(null);
+    }
+
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+>>>>>>> devendev
     }
 
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
+<<<<<<< HEAD
+=======
+
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username).orElse(null);
+    }
+>>>>>>> devendev
 }
