@@ -1,5 +1,9 @@
-// API Configuration
-const API_BASE_URL = 'http://localhost:8080/api';
+// API Configuration - Use same host as current page
+const getApiBaseUrl = () => {
+    const hostname = window.location.hostname;
+    return `http://${hostname}:8080/api`;
+};
+const API_BASE_URL = getApiBaseUrl();
 
 // DOM Elements
 const loginForm = document.getElementById('login-form');
@@ -37,11 +41,7 @@ loginForm.addEventListener('submit', async function(event) {
     
     const formData = new FormData(loginForm);
     const loginData = {
-<<<<<<< HEAD
-        email: formData.get('email'),
-=======
         username: formData.get('email'),
->>>>>>> devendev
         password: formData.get('password')
     };
 
@@ -61,25 +61,10 @@ loginForm.addEventListener('submit', async function(event) {
 
         const result = await response.json();
 
-<<<<<<< HEAD
-        if (response.ok && result.success) {
-            // Store user data in localStorage
-            localStorage.setItem('user', JSON.stringify(result.user));
-            localStorage.setItem('token', result.token);
-=======
         if (response.ok) {
             // Store user data in localStorage
-            const userData = result.data;
-            localStorage.setItem('user', JSON.stringify({
-                id: userData.id,
-                username: userData.username,
-                email: userData.email,
-                role: userData.role,
-                name: userData.username
-            }));
-            localStorage.setItem('token', userData.accessToken || userData.token);
-            localStorage.setItem('userRole', userData.role || 'USER');
->>>>>>> devendev
+            localStorage.setItem('user', JSON.stringify(result.data));
+            localStorage.setItem('token', result.data.token);
             
             alert('Login successful!');
             window.location.href = 'dashboard.html';
@@ -93,15 +78,8 @@ loginForm.addEventListener('submit', async function(event) {
 });
 
 function validateLoginForm(data) {
-<<<<<<< HEAD
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    
-    if (!emailPattern.test(data.email)) {
-        alert("Please enter a valid email address.");
-=======
     if (data.username.length < 2) {
         alert("Please enter a valid username.");
->>>>>>> devendev
         return false;
     }
     

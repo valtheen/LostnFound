@@ -1,5 +1,9 @@
-// API Configuration
-const API_BASE_URL = 'http://localhost:8080/api';
+// API Configuration - Use same host as current page
+const getApiBaseUrl = () => {
+    const hostname = window.location.hostname;
+    return `http://${hostname}:8080/api`;
+};
+const API_BASE_URL = getApiBaseUrl();
 
 // DOM Elements
 const signupForm = document.getElementById('signup-form');
