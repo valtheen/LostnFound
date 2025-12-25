@@ -1,5 +1,9 @@
-// API Configuration
-const API_BASE_URL = 'http://localhost:8080/api';
+// API Configuration - Use same host as current page
+const getApiBaseUrl = () => {
+    const hostname = window.location.hostname;
+    return `http://${hostname}:8080/api`;
+};
+const API_BASE_URL = getApiBaseUrl();
 
 // DOM Elements
 const tableBody = document.getElementById('table-body');
@@ -30,8 +34,8 @@ function checkAuthStatus() {
     }
     
     // Display user name
-    if (user.name) {
-        userNameElement.textContent = user.name;
+    if (user.username || user.name) {
+        userNameElement.textContent = user.username || user.name;
     }
 }
 
@@ -106,7 +110,11 @@ function createTableRow(item, rowNumber) {
         <td><span class="status ${statusClass}">${item.keterangan || 'N/A'}</span></td>
         <td>${item.namaPemilik || 'N/A'}</td>
         <td>${item.lokasi || 'N/A'}</td>
-        <td><i class="fas fa-eye action-view" onclick="viewImage('${item.id || ''}')"></i></td>
+        <td>
+            <i class="fas fa-eye action-view" onclick="viewImage('${item.id || ''}')" title="View Image"></i>
+            <i class="fas fa-edit action-edit" onclick="editReport('${item.id || ''}')" title="Edit"></i>
+            <i class="fas fa-trash action-delete" onclick="deleteReport('${item.id || ''}')" title="Delete"></i>
+        </td>
         <td><input type="checkbox" onchange="toggleSelection('${item.id || ''}')"></td>
     `;
     
@@ -195,8 +203,119 @@ function setupSearch() {
 }
 
 function viewImage(itemId) {
-    // This would typically open a modal or navigate to a detail page
-    alert('Image viewer functionality will be implemented soon.');
+    const item = allItems.find(i => i.id == itemId);
+    if (item && item.gambarPath) {
+        const imageUrl = `http://localhost:8080/api/pelaporan/file/${item.gambarPath}`;
+        window.open(imageUrl, '_blank');
+    } else {
+        alert('No image available for this item.');
+    }
+}
+
+async function editReport(itemId) {
+    const item = allItems.find(i => i.id == itemId);
+    if (!item) {
+        alert('Item not found');
+        return;
+    }
+    
+    // Prompt for new values (you can replace this with a modal form later)
+    const namaBarang = prompt('Nama Barang:', item.namaBarang || '');
+    if (namaBarang === null) return; // User cancelled
+    
+    const keterangan = prompt('Keterangan (Hilang/Ditemukan):', item.keterangan || '');
+    if (keterangan === null) return;
+    
+    const namaPemilik = prompt('Nama Pemilik/Penemu:', item.namaPemilik || '');
+    if (namaPemilik === null) return;
+    
+    const lokasi = prompt('Lokasi:', item.lokasi || '');
+    if (lokasi === null) return;
+    
+    const noHandphone = prompt('No. Handphone:', item.noHandphone || '');
+    if (noHandphone === null) return;
+    
+    try {
+        const token = localStorage.getItem('token');
+        const formData = new FormData();
+        formData.append('namaBarang', namaBarang);
+        formData.append('tanggal', item.tanggal || new Date().toISOString().split('T')[0]);
+        formData.append('keterangan', keterangan);
+        formData.append('namaPemilik', namaPemilik);
+        formData.append('lokasi', lokasi);
+        formData.append('noHandphone', noHandphone);
+        
+        const response = await fetch(`${API_BASE_URL}/pelaporan/${itemId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        });
+        
+        if (!response.ok) {
+            let errorMessage = 'Failed to update report.';
+            try {
+                const errorResult = await response.json();
+                errorMessage = errorResult.message || errorResult.error || errorMessage;
+            } catch (e) {
+                errorMessage = `Server error: ${response.status}`;
+            }
+            alert(errorMessage);
+            return;
+        }
+        
+        const result = await response.json();
+        if (result.success) {
+            alert('Report updated successfully!');
+            loadItems(); // Reload the list
+        } else {
+            alert(result.message || 'Failed to update report.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Network error. Please check your connection and try again.');
+    }
+}
+
+async function deleteReport(itemId) {
+    if (!confirm('Are you sure you want to delete this report?')) {
+        return;
+    }
+    
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE_URL}/pelaporan/${itemId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            let errorMessage = 'Failed to delete report.';
+            try {
+                const errorResult = await response.json();
+                errorMessage = errorResult.message || errorResult.error || errorMessage;
+            } catch (e) {
+                errorMessage = `Server error: ${response.status}`;
+            }
+            alert(errorMessage);
+            return;
+        }
+        
+        const result = await response.json();
+        if (result.success) {
+            alert('Report deleted successfully!');
+            loadItems(); // Reload the list
+        } else {
+            alert(result.message || 'Failed to delete report.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Network error. Please check your connection and try again.');
+    }
 }
 
 function toggleSelection(itemId) {

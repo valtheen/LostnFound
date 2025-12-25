@@ -1,5 +1,9 @@
-// API Configuration
-const API_BASE_URL = 'http://localhost:8080/api';
+// API Configuration - Use same host as current page
+const getApiBaseUrl = () => {
+    const hostname = window.location.hostname;
+    return `http://${hostname}:8080/api`;
+};
+const API_BASE_URL = getApiBaseUrl();
 
 // DOM Elements
 const userNameElement = document.getElementById('user-name');
@@ -25,8 +29,8 @@ function checkAuthStatus() {
     }
     
     // Display user name
-    if (user.name) {
-        userNameElement.textContent = user.name;
+    if (user.username || user.name) {
+        userNameElement.textContent = user.username || user.name;
     }
 }
 
@@ -47,7 +51,7 @@ async function loadStats() {
     try {
         const token = localStorage.getItem('token');
         
-        const response = await fetch(`${API_BASE_URL}/barang/stats`, {
+        const response = await fetch(`${API_BASE_URL}/pelaporan/stats`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -56,8 +60,13 @@ async function loadStats() {
         });
         
         if (response.ok) {
-            const stats = await response.json();
-            updateStatsDisplay(stats);
+            const result = await response.json();
+            // Backend returns {success: true, data: {totalItems, lostItems, foundItems, totalReports}}
+            if (result.success && result.data) {
+                updateStatsDisplay(result.data);
+            } else {
+                throw new Error('Invalid response format');
+            }
         } else {
             throw new Error('Failed to load stats');
         }
@@ -90,7 +99,7 @@ async function loadRecentActivity() {
     try {
         const token = localStorage.getItem('token');
         
-        const response = await fetch(`${API_BASE_URL}/barang/recent`, {
+        const response = await fetch(`${API_BASE_URL}/pelaporan/recent?limit=5`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -99,8 +108,21 @@ async function loadRecentActivity() {
         });
         
         if (response.ok) {
-            const activities = await response.json();
-            renderRecentActivity(activities);
+            const result = await response.json();
+            // Backend returns {success: true, data: [...]}
+            if (result.success && result.data) {
+                // Convert ItemReportDTO format to activity format
+                const activities = result.data.map(item => ({
+                    id: item.id || Math.random().toString(36).substr(2, 9),
+                    type: item.keterangan && item.keterangan.toLowerCase() === 'hilang' ? 'lost' : 'found',
+                    title: `${item.keterangan === 'Hilang' ? 'Lost' : 'Found'}: ${item.namaBarang}`,
+                    description: `Reported by ${item.namaPemilik} at ${item.lokasi}`,
+                    time: item.tanggal || new Date().toISOString().split('T')[0]
+                }));
+                renderRecentActivity(activities);
+            } else {
+                throw new Error('Invalid response format');
+            }
         } else {
             throw new Error('Failed to load recent activity');
         }

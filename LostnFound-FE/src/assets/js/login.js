@@ -1,5 +1,9 @@
-// API Configuration
-const API_BASE_URL = 'http://localhost:8080/api';
+// API Configuration - Use same host as current page
+const getApiBaseUrl = () => {
+    const hostname = window.location.hostname;
+    return `http://${hostname}:8080/api`;
+};
+const API_BASE_URL = getApiBaseUrl();
 
 // DOM Elements
 const loginForm = document.getElementById('login-form');
@@ -60,7 +64,7 @@ loginForm.addEventListener('submit', async function(event) {
         if (response.ok) {
             // Store user data in localStorage
             localStorage.setItem('user', JSON.stringify(result.data));
-            localStorage.setItem('token', result.data.accessToken);
+            localStorage.setItem('token', result.data.token);
             
             alert('Login successful!');
             window.location.href = 'dashboard.html';
