@@ -2,6 +2,34 @@ package IPPL.LostnFound.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+<<<<<<< HEAD
+import jakarta.validation.constraints.Pattern;
+
+public class RegisterRequest {
+
+    @Email
+    @NotBlank
+    private String email;
+
+    @NotBlank
+    private String password;
+
+    @NotBlank
+    private String name;
+
+    @NotBlank
+    @Pattern(regexp = "\\d{10,13}", message = "Nomor telepon harus 10-13 digit")
+    private String phone;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+=======
 import jakarta.validation.constraints.Size;
 
 public class RegisterRequest {
@@ -17,18 +45,23 @@ public class RegisterRequest {
     @NotBlank(message = "Email is required")
     @Email(message = "Email should be valid")
     private String email;
-    
-    @NotBlank(message = "Role is required")
-    private String role;
+
+    private String phone;
 
     public RegisterRequest() {
     }
 
-    public RegisterRequest(String username, String password, String email, String role) {
+    public RegisterRequest(String username, String password, String email) {
         this.username = username;
         this.password = password;
         this.email = email;
-        this.role = role;
+    }
+
+    public RegisterRequest(String username, String password, String email, String phone) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.phone = phone;
     }
 
     public String getUsername() {
@@ -39,6 +72,7 @@ public class RegisterRequest {
         this.username = username;
     }
 
+>>>>>>> devendev
     public String getPassword() {
         return password;
     }
@@ -47,19 +81,28 @@ public class RegisterRequest {
         this.password = password;
     }
 
+<<<<<<< HEAD
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+=======
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+>>>>>>> devendev
     }
 
-    public String getRole() {
-        return role;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }

@@ -50,6 +50,13 @@
 
         <section class="content-area">
             <div class="content-header">
+<<<<<<< HEAD
+=======
+                <div class="header-actions" id="header-actions">
+                    <i class="fas fa-trash action-icon" id="delete-icon" onclick="deleteSelectedItems()" title="Delete Selected" style="display: none;"></i>
+                    <i class="fas fa-pencil-alt action-icon" id="edit-icon" onclick="editSelectedItem()" title="Edit Selected" style="display: none;"></i>
+                </div>
+>>>>>>> devendev
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Search" id="search-input">
@@ -64,9 +71,16 @@
                         <th>Tanggal</th>
                         <th>Keterangan</th>
                         <th>Nama Pemilik / Penemu</th>
+<<<<<<< HEAD
                         <th>Lokasi</th>
                         <th>Gambar</th>
                         <th>Action</th>
+=======
+                        <th>Kategori</th>
+                        <th>Lokasi</th>
+                        <th>Gambar</th>
+                        <th><input type="checkbox" id="select-all-gambar" onchange="toggleSelectAllGambar()"></th>
+>>>>>>> devendev
                     </tr>
                 </thead>
                 <tbody id="table-body">

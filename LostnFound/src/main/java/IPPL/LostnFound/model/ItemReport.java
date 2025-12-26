@@ -1,8 +1,23 @@
 package IPPL.LostnFound.model;
 
+<<<<<<< HEAD
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
+=======
+import java.time.LocalDate;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+>>>>>>> devendev
 @Entity
 @Table(name = "item_reports")
 public class ItemReport {
@@ -29,11 +44,27 @@ public class ItemReport {
     @Column(nullable = false)
     private String noHandphone;
 
+<<<<<<< HEAD
+=======
+    @Column
+    private String kategori;
+
+>>>>>>> devendev
     @Column(columnDefinition = "TEXT")
     private String gambarPath;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+<<<<<<< HEAD
+    @JsonIgnore
+    private User user;
+
+    public ItemReport() {
+    }
+
+    public ItemReport(String namaBarang, LocalDate tanggal, String keterangan,
+                      String namaPemilik, String lokasi, String noHandphone, User user) {
+=======
     private User user;
 
     // Constructors
@@ -42,6 +73,7 @@ public class ItemReport {
 
     public ItemReport(String namaBarang, LocalDate tanggal, String keterangan, 
                      String namaPemilik, String lokasi, String noHandphone, User user) {
+>>>>>>> devendev
         this.namaBarang = namaBarang;
         this.tanggal = tanggal;
         this.keterangan = keterangan;
@@ -51,7 +83,10 @@ public class ItemReport {
         this.user = user;
     }
 
+<<<<<<< HEAD
+=======
     // Getters and Setters
+>>>>>>> devendev
     public Long getId() {
         return id;
     }
@@ -108,6 +143,17 @@ public class ItemReport {
         this.noHandphone = noHandphone;
     }
 
+<<<<<<< HEAD
+=======
+    public String getKategori() {
+        return kategori;
+    }
+
+    public void setKategori(String kategori) {
+        this.kategori = kategori;
+    }
+
+>>>>>>> devendev
     public String getGambarPath() {
         return gambarPath;
     }
@@ -123,4 +169,8 @@ public class ItemReport {
     public void setUser(User user) {
         this.user = user;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> devendev
