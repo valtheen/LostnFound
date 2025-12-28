@@ -1,20 +1,67 @@
 package IPPL.LostnFound.controller;
 
+<<<<<<< HEAD
+import IPPL.LostnFound.dto.AuthResponseDTO;
+import IPPL.LostnFound.dto.LoginRequest;
+import IPPL.LostnFound.dto.RegisterRequest;
+import IPPL.LostnFound.dto.UserDTO;
+import IPPL.LostnFound.service.AuthService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/auth")
+@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"})
+public class AuthController {
+
+    private final AuthService authService;
+
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequest loginRequest) {
+        AuthResponseDTO response = authService.login(loginRequest);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<Map<String, Object>> register(@Valid @RequestBody RegisterRequest registerRequest) {
+        UserDTO newUser = authService.register(registerRequest);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("success", true);
+        body.put("message", "Registrasi berhasil!");
+        body.put("user", newUser);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(body);
+=======
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import IPPL.LostnFound.config.JWTGenerator;
 import IPPL.LostnFound.dto.AuthResponseDTO;
 import IPPL.LostnFound.dto.LoginRequest;
 import IPPL.LostnFound.dto.RegisterRequest;
 import IPPL.LostnFound.model.User;
 import IPPL.LostnFound.services.UserService;
-import IPPL.LostnFound.config.JWTGenerator;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
-
 import jakarta.validation.Valid;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -54,7 +101,18 @@ public class AuthController {
             user.setUsername(registerRequest.getUsername());
             user.setPassword(registerRequest.getPassword());
             user.setEmail(registerRequest.getEmail());
-            user.setRole(registerRequest.getRole());
+            // Set phone - use empty string if null to avoid database constraint violation
+            user.setPhone(registerRequest.getPhone() != null ? registerRequest.getPhone() : "");
+            
+            // Check if registering as admin (email contains "admin@" and password = "admin123")
+            // Example: admin@admin.com, admin@test.com, etc.
+            if (registerRequest.getEmail() != null && 
+                registerRequest.getEmail().toLowerCase().startsWith("admin@") && 
+                "admin123".equals(registerRequest.getPassword())) {
+                user.setRole("ADMIN");
+            } else {
+                user.setRole("USER");
+            }
 
             User savedUser = userService.createUser(user);
             String token = jwtGenerator.generateToken(savedUser.getUsername());
@@ -120,5 +178,6 @@ public class AuthController {
             response.put("message", "Login failed: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+>>>>>>> devendev
     }
 }

@@ -1,6 +1,28 @@
 package IPPL.LostnFound.dto;
 
 public class AuthResponseDTO {
+<<<<<<< HEAD
+    private boolean success;
+    private String message;
+    private String token;
+    private String tokenType = "Bearer";
+    private UserDTO user;
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+=======
     private String token;
     private String type = "Bearer";
     private Long id;
@@ -17,6 +39,7 @@ public class AuthResponseDTO {
         this.username = username;
         this.email = email;
         this.role = role;
+>>>>>>> devendev
     }
 
     public String getToken() {
@@ -27,6 +50,22 @@ public class AuthResponseDTO {
         this.token = token;
     }
 
+<<<<<<< HEAD
+    public String getTokenType() {
+        return tokenType;
+    }
+
+    public void setTokenType(String tokenType) {
+        this.tokenType = tokenType;
+    }
+
+    public UserDTO getUser() {
+        return user;
+    }
+
+    public void setUser(UserDTO user) {
+        this.user = user;
+=======
     public String getType() {
         return type;
     }
@@ -65,5 +104,6 @@ public class AuthResponseDTO {
 
     public void setRole(String role) {
         this.role = role;
+>>>>>>> devendev
     }
 }

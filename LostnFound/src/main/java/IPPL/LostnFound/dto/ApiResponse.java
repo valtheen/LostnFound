@@ -8,7 +8,10 @@ public class ApiResponse {
     private Object data;
     private Map<String, Object> errors;
 
+<<<<<<< HEAD
+=======
     // Constructors
+>>>>>>> devendev
     public ApiResponse() {
     }
 
@@ -30,7 +33,10 @@ public class ApiResponse {
         this.errors = errors;
     }
 
+<<<<<<< HEAD
+=======
     // Static factory methods
+>>>>>>> devendev
     public static ApiResponse success(String message) {
         return new ApiResponse(true, message);
     }
@@ -47,7 +53,10 @@ public class ApiResponse {
         return new ApiResponse(false, message, null, errors);
     }
 
+<<<<<<< HEAD
+=======
     // Getters and Setters
+>>>>>>> devendev
     public boolean isSuccess() {
         return success;
     }

@@ -3,6 +3,12 @@ package IPPL.LostnFound.dto;
 public class UserDTO {
     private Long id;
     private String email;
+<<<<<<< HEAD
+    private String name;
+    private String phone;
+    private String role;
+
+=======
     private String nama;
     private String noHandphone;
     private String alamat;
@@ -20,6 +26,7 @@ public class UserDTO {
     }
 
     // Getters and Setters
+>>>>>>> devendev
     public Long getId() {
         return id;
     }
@@ -36,6 +43,30 @@ public class UserDTO {
         this.email = email;
     }
 
+<<<<<<< HEAD
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+=======
     public String getNama() {
         return nama;
     }
@@ -58,5 +89,6 @@ public class UserDTO {
 
     public void setAlamat(String alamat) {
         this.alamat = alamat;
+>>>>>>> devendev
     }
 }
