@@ -13,8 +13,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import IPPL.LostnFound.config.JWTGenerator;
 import IPPL.LostnFound.dto.ApiResponse;
 import IPPL.LostnFound.dto.ItemReportDTO;
 import IPPL.LostnFound.model.ItemReport;
@@ -46,6 +49,9 @@ public class PelaporanController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private JWTGenerator jwtGenerator;
+
     private static final String UPLOAD_DIR = "uploads/";
 
     @PostMapping
@@ -61,22 +67,8 @@ public class PelaporanController {
             @RequestHeader(value = "Authorization", required = false) String token) {
         
         try {
-            // Extract user ID from token
-            Long userId = null;
-            if (token != null && token.startsWith("Bearer ")) {
-                try {
-                    String userIdStr = token.replace("Bearer jwt-token-", "");
-                    userId = Long.parseLong(userIdStr);
-                } catch (NumberFormatException e) {
-                    // Invalid token format, continue without user
-                }
-            }
-            
-            User user = null;
-            if (userId != null) {
-                Optional<User> userOpt = userRepository.findById(userId);
-                user = userOpt.orElse(null);
-            }
+            // Extract user from token
+            User user = getUserFromToken(token);
             
             // Create new item report
             ItemReport itemReport = new ItemReport();
@@ -241,6 +233,7 @@ public class PelaporanController {
     }
 
     @DeleteMapping("/{id}")
+    @Transactional(timeout = 30)
     public ResponseEntity<ApiResponse> deleteReport(
             @PathVariable Long id,
             @RequestHeader(value = "Authorization", required = false) String token) {
@@ -260,7 +253,7 @@ public class PelaporanController {
                     .body(ApiResponse.error("Only administrators can delete reports"));
             }
             
-            // Delete associated image file if exists
+            // Delete associated image file if exists (outside transaction)
             if (report.getGambarPath() != null && !report.getGambarPath().isEmpty()) {
                 try {
                     Path filePath = Paths.get(UPLOAD_DIR + report.getGambarPath());
@@ -273,8 +266,13 @@ public class PelaporanController {
                 }
             }
             
+            // Delete report
             itemReportRepository.deleteById(id);
             return ResponseEntity.ok(ApiResponse.success("Report deleted successfully", null));
+        } catch (DataAccessException e) {
+            System.err.println("Database error deleting report: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error("Database error: " + e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error("Failed to delete report: " + e.getMessage()));
@@ -282,6 +280,7 @@ public class PelaporanController {
     }
 
     @DeleteMapping("/bulk")
+    @Transactional(timeout = 60)
     public ResponseEntity<ApiResponse> deleteReports(
             @RequestBody Map<String, List<Long>> request,
             @RequestHeader(value = "Authorization", required = false) String token) {
@@ -304,9 +303,15 @@ public class PelaporanController {
                     .body(ApiResponse.error("Only administrators can delete reports"));
             }
             
+            // Get all reports first to check existence and get image paths
             List<ItemReport> reports = itemReportRepository.findAllById(ids);
             
-            // Delete associated image files
+            if (reports.isEmpty()) {
+                return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("No reports found with provided IDs"));
+            }
+            
+            // Delete associated image files first (outside transaction to avoid lock)
             for (ItemReport report : reports) {
                 if (report.getGambarPath() != null && !report.getGambarPath().isEmpty()) {
                     try {
@@ -315,14 +320,20 @@ public class PelaporanController {
                             Files.delete(filePath);
                         }
                     } catch (IOException e) {
+                        // Log error but continue with deletion
                         System.err.println("Failed to delete image file: " + e.getMessage());
                     }
                 }
             }
             
-            // Delete all reports
-            itemReportRepository.deleteAll(reports);
+            // Delete all reports using deleteAllById (more efficient than deleteAll)
+            itemReportRepository.deleteAllById(ids);
+            
             return ResponseEntity.ok(ApiResponse.success("Reports deleted successfully", null));
+        } catch (DataAccessException e) {
+            System.err.println("Database error deleting reports: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error("Database error: " + e.getMessage() + ". Please try again or contact administrator."));
         } catch (Exception e) {
             System.err.println("Error deleting reports: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -336,11 +347,20 @@ public class PelaporanController {
             return null;
         }
         try {
-            String userIdStr = token.replace("Bearer jwt-token-", "");
-            Long userId = Long.parseLong(userIdStr);
-            Optional<User> userOpt = userRepository.findById(userId);
+            // Remove "Bearer " prefix
+            String tokenValue = token.substring(7);
+            
+            // Use JWTGenerator to get username from token
+            String username = jwtGenerator.getUsernameFromToken(tokenValue);
+            if (username == null) {
+                return null;
+            }
+            
+            // Find user by username
+            Optional<User> userOpt = userRepository.findByUsername(username);
             return userOpt.orElse(null);
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
+            System.err.println("Error parsing token: " + e.getMessage());
             return null;
         }
     }

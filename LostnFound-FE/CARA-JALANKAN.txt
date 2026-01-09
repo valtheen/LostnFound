@@ -1,0 +1,75 @@
+========================================
+CARA MENJALANKAN FRONTEND (WINDOWS)
+========================================
+
+MASALAH YANG TERJADI:
+- Error "Cannot find path" karena path tidak sesuai
+- npm mencari package.json di lokasi yang salah
+
+SOLUSI CEPAT:
+=============
+
+CARA 1: Menggunakan File Batch (PALING MUDAH)
+----------------------------------------------
+1. Buka File Explorer
+2. Navigasi ke folder:
+   C:\Users\PC\Downloads\LostnFound-main Final\LostnFound-main\LostnFound-main\LostnFound-FE
+3. Double-click file: install.bat
+4. Tunggu sampai selesai
+5. Setelah selesai, jalankan: npm run dev
+
+
+CARA 2: Menggunakan PowerShell/Command Prompt
+----------------------------------------------
+1. Buka PowerShell atau Command Prompt
+2. Copy dan paste perintah ini (tekan Enter setelah setiap baris):
+
+   cd "C:\Users\PC\Downloads\LostnFound-main Final\LostnFound-main\LostnFound-main\LostnFound-FE"
+   
+   npm install
+   
+   npm run dev
+
+
+CARA 3: Menggunakan PowerShell Script
+--------------------------------------
+1. Buka PowerShell
+2. Masuk ke folder frontend:
+   cd "C:\Users\PC\Downloads\LostnFound-main Final\LostnFound-main\LostnFound-main\LostnFound-FE"
+3. Jika muncul error execution policy, jalankan:
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+4. Jalankan script:
+   .\install.ps1
+5. Setelah selesai:
+   npm run dev
+
+
+VERIFIKASI:
+-----------
+Setelah menjalankan npm install, pastikan:
+- Folder node_modules sudah ada
+- Tidak ada error di terminal
+- package.json ada di folder tersebut
+
+
+MENJALANKAN SERVER:
+-------------------
+Setelah instalasi selesai, jalankan salah satu:
+
+Development (dengan CORS):
+  npm run dev
+
+Production:
+  npm start
+
+Frontend akan tersedia di: http://localhost:3000
+
+
+CATATAN PENTING:
+----------------
+- PASTIKAN Anda sudah masuk ke folder LostnFound-FE sebelum menjalankan npm
+- Backend harus running di http://localhost:8080
+- Jika masih error, pastikan path lengkap sesuai dengan struktur folder Anda
+
+
+

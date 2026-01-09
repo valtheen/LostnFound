@@ -4,12 +4,12 @@
   "description": "Frontend application for Lost n Found system",
   "main": "index.js",
   "scripts": {
-    "start": "http-server src -p 3000 -o",
-    "dev": "http-server src -p 3000 -o --cors",
+    "start": "http-server ./src -p 3000 -o -a localhost -c-1",
+    "dev": "http-server ./src -p 3000 -o -a localhost --cors -c-1",
     "build": "echo 'Build process would go here'",
     "test": "echo 'Tests would go here'",
     "install-deps": "npm install",
-    "serve": "http-server src -p 3000"
+    "serve": "http-server ./src -p 3000 -a localhost -c-1"
   },
   "keywords": [
     "lost",
