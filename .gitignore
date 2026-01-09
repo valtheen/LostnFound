@@ -31,3 +31,19 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Node Modules ###
+node_modules/
+LostnFound-FE/node_modules/
+
+### Application Properties (contains sensitive data) ###
+LostnFound/src/main/resources/application.properties
+
+### Uploads ###
+uploads/
+*.jpg
+*.jpeg
+*.png
+*.gif
+!**/src/**/*.jpg
+!**/src/**/*.png

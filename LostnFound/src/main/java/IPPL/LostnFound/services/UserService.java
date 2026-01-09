@@ -54,6 +54,13 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
+    public boolean existsByPhone(String phone) {
+        if (phone == null || phone.trim().isEmpty()) {
+            return false;
+        }
+        return userRepository.existsByPhone(phone);
+    }
+
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username).orElse(null);
     }
