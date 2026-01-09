@@ -118,7 +118,23 @@ signupForm.addEventListener('submit', async function(event) {
             let errorMessage = 'Sign up failed. Please try again.';
             try {
                 const errorResult = await response.json();
-                errorMessage = errorResult.message || errorResult.error || errorMessage;
+                const rawMessage = errorResult.message || errorResult.error || errorMessage;
+                
+                // Parse duplicate entry errors and make them user-friendly
+                if (rawMessage.includes('Duplicate entry')) {
+                    // Check which field is duplicate
+                    if (rawMessage.includes(userData.phone) || rawMessage.toLowerCase().includes('phone')) {
+                        errorMessage = `Nomor telepon ${userData.phone} sudah terdaftar. Silakan gunakan nomor telepon lain atau login jika Anda sudah memiliki akun.`;
+                    } else if (rawMessage.toLowerCase().includes('email') || rawMessage.includes(userData.email)) {
+                        errorMessage = `Email ${userData.email} sudah terdaftar. Silakan gunakan email lain atau login jika Anda sudah memiliki akun.`;
+                    } else if (rawMessage.toLowerCase().includes('username') || rawMessage.includes(userData.username)) {
+                        errorMessage = `Username "${userData.username}" sudah digunakan. Silakan pilih username lain.`;
+                    } else {
+                        errorMessage = 'Data yang Anda masukkan sudah terdaftar. Silakan gunakan data lain atau login jika Anda sudah memiliki akun.';
+                    }
+                } else {
+                    errorMessage = rawMessage;
+                }
             } catch (e) {
                 // If response is not JSON, use status text
                 errorMessage = `HTTP ${response.status}: ${response.statusText}`;

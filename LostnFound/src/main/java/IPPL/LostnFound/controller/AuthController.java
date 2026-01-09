@@ -96,6 +96,14 @@ public class AuthController {
                 return ResponseEntity.badRequest().body(response);
             }
 
+            // Check if phone number already exists (if provided)
+            String phoneNumber = registerRequest.getPhone() != null ? registerRequest.getPhone().trim() : "";
+            if (!phoneNumber.isEmpty() && userService.existsByPhone(phoneNumber)) {
+                response.put("success", false);
+                response.put("message", "Nomor telepon " + phoneNumber + " sudah terdaftar. Silakan gunakan nomor telepon lain atau login jika Anda sudah memiliki akun.");
+                return ResponseEntity.badRequest().body(response);
+            }
+
             // Create new user
             User user = new User();
             user.setUsername(registerRequest.getUsername());
@@ -128,7 +136,24 @@ public class AuthController {
 
         } catch (Exception e) {
             response.put("success", false);
-            response.put("message", "Registration failed: " + e.getMessage());
+            String errorMessage = e.getMessage();
+            
+            // Parse database constraint errors and make them user-friendly
+            if (errorMessage != null && errorMessage.contains("Duplicate entry")) {
+                if (errorMessage.contains("phone") || errorMessage.contains("UKdu5v5sr43g5bfnji4vb8hg5s3")) {
+                    String phone = registerRequest.getPhone() != null ? registerRequest.getPhone() : "";
+                    response.put("message", "Nomor telepon " + phone + " sudah terdaftar. Silakan gunakan nomor telepon lain atau login jika Anda sudah memiliki akun.");
+                } else if (errorMessage.contains("email")) {
+                    response.put("message", "Email " + registerRequest.getEmail() + " sudah terdaftar. Silakan gunakan email lain atau login jika Anda sudah memiliki akun.");
+                } else if (errorMessage.contains("username") || errorMessage.contains("name")) {
+                    response.put("message", "Username \"" + registerRequest.getUsername() + "\" sudah digunakan. Silakan pilih username lain.");
+                } else {
+                    response.put("message", "Data yang Anda masukkan sudah terdaftar. Silakan gunakan data lain atau login jika Anda sudah memiliki akun.");
+                }
+            } else {
+                response.put("message", "Registration failed: " + errorMessage);
+            }
+            
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }

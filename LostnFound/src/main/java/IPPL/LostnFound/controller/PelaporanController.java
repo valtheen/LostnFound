@@ -1,31 +1,47 @@
 package IPPL.LostnFound.controller;
 
-import IPPL.LostnFound.dto.ApiResponse;
-import IPPL.LostnFound.dto.ItemReportDTO;
-import IPPL.LostnFound.model.ItemReport;
-import IPPL.LostnFound.model.User;
-import IPPL.LostnFound.repository.ItemReportRepository;
-import IPPL.LostnFound.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import IPPL.LostnFound.config.JWTGenerator;
+import IPPL.LostnFound.dto.ApiResponse;
+import IPPL.LostnFound.dto.ItemReportDTO;
+import IPPL.LostnFound.model.ItemReport;
+import IPPL.LostnFound.model.User;
+import IPPL.LostnFound.repository.ItemReportRepository;
+import IPPL.LostnFound.repository.UserRepository;
 
 @RestController
 @RequestMapping("/api/pelaporan")
@@ -37,6 +53,9 @@ public class PelaporanController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private JWTGenerator jwtGenerator;
 
     private static final String UPLOAD_DIR = "uploads/";
 
@@ -52,22 +71,8 @@ public class PelaporanController {
             @RequestHeader(value = "Authorization", required = false) String token) {
         
         try {
-            // Extract user ID from token
-            Long userId = null;
-            if (token != null && token.startsWith("Bearer ")) {
-                try {
-                    String userIdStr = token.replace("Bearer jwt-token-", "");
-                    userId = Long.parseLong(userIdStr);
-                } catch (NumberFormatException e) {
-                    // Invalid token format, continue without user
-                }
-            }
-            
-            User user = null;
-            if (userId != null) {
-                Optional<User> userOpt = userRepository.findById(userId);
-                user = userOpt.orElse(null);
-            }
+            // Extract user from token
+            User user = getUserFromToken(token);
             
             // Create new item report
             ItemReport itemReport = new ItemReport();
@@ -129,7 +134,7 @@ public class PelaporanController {
             long lostItems = itemReportRepository.countLostItems();
             long foundItems = itemReportRepository.countFoundItems();
             
-            java.util.Map<String, Long> stats = new java.util.HashMap<>();
+            Map<String, Long> stats = new HashMap<>();
             stats.put("totalItems", totalItems);
             stats.put("lostItems", lostItems);
             stats.put("foundItems", foundItems);
@@ -148,11 +153,11 @@ public class PelaporanController {
             List<ItemReport> allReports = itemReportRepository.findAllOrderByTanggalDesc();
             List<ItemReport> recentReports = allReports.stream()
                 .limit(limit)
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
             
             List<ItemReportDTO> reportDTOs = recentReports.stream()
                 .map(this::convertToDTO)
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
             
             return ResponseEntity.ok(ApiResponse.success("Recent reports fetched successfully", reportDTOs));
         } catch (Exception e) {
@@ -198,6 +203,13 @@ public class PelaporanController {
             }
             
             ItemReport itemReport = reportOpt.get();
+            
+            // Check if user can modify this report
+            User user = getUserFromToken(token);
+            if (!canModifyReport(itemReport, user)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("You don't have permission to modify this report"));
+            }
             
             // Update fields if provided
             if (namaBarang != null && !namaBarang.isEmpty()) {
@@ -262,7 +274,10 @@ public class PelaporanController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse> deleteReport(@PathVariable Long id) {
+    @Transactional(timeout = 30)
+    public ResponseEntity<ApiResponse> deleteReport(
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) String token) {
         try {
             Optional<ItemReport> reportOpt = itemReportRepository.findById(id);
             if (!reportOpt.isPresent()) {
@@ -272,8 +287,15 @@ public class PelaporanController {
             
             ItemReport itemReport = reportOpt.get();
             
-            // Delete associated file if exists
-            if (itemReport.getGambarPath() != null) {
+            // Only admin can delete reports
+            User user = getUserFromToken(token);
+            if (user == null || !"ADMIN".equals(user.getRole())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("Only administrators can delete reports"));
+            }
+            
+            // Delete associated image file if exists (outside transaction)
+            if (itemReport.getGambarPath() != null && !itemReport.getGambarPath().isEmpty()) {
                 try {
                     Path filePath = Paths.get(UPLOAD_DIR + itemReport.getGambarPath());
                     if (Files.exists(filePath)) {
@@ -285,13 +307,79 @@ public class PelaporanController {
                 }
             }
             
+            // Delete report
             itemReportRepository.deleteById(id);
             
             return ResponseEntity.ok(ApiResponse.success("Report deleted successfully", null));
-            
+        } catch (DataAccessException e) {
+            System.err.println("Database error deleting report: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error("Database error: " + e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error("Failed to delete report: " + e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/bulk")
+    @Transactional(timeout = 60)
+    public ResponseEntity<ApiResponse> deleteReports(
+            @RequestBody Map<String, List<Long>> request,
+            @RequestHeader(value = "Authorization", required = false) String token) {
+        try {
+            User user = getUserFromToken(token);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Authentication required"));
+            }
+            
+            // Only admin can delete reports
+            if (!"ADMIN".equals(user.getRole())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("Only administrators can delete reports"));
+            }
+            
+            List<Long> ids = request.get("ids");
+            if (ids == null || ids.isEmpty()) {
+                return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("No report IDs provided"));
+            }
+            
+            // Get all reports first to check existence and get image paths
+            List<ItemReport> reports = itemReportRepository.findAllById(ids);
+            
+            if (reports.isEmpty()) {
+                return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("No reports found with provided IDs"));
+            }
+            
+            // Delete associated image files first (outside transaction to avoid lock)
+            for (ItemReport report : reports) {
+                if (report.getGambarPath() != null && !report.getGambarPath().isEmpty()) {
+                    try {
+                        Path filePath = Paths.get(UPLOAD_DIR + report.getGambarPath());
+                        if (Files.exists(filePath)) {
+                            Files.delete(filePath);
+                        }
+                    } catch (IOException e) {
+                        // Log error but continue with deletion
+                        System.err.println("Failed to delete image file: " + e.getMessage());
+                    }
+                }
+            }
+            
+            // Delete all reports using deleteAllById (more efficient than deleteAll)
+            itemReportRepository.deleteAllById(ids);
+            
+            return ResponseEntity.ok(ApiResponse.success("Reports deleted successfully", null));
+        } catch (DataAccessException e) {
+            System.err.println("Database error deleting reports: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error("Database error: " + e.getMessage() + ". Please try again or contact administrator."));
+        } catch (Exception e) {
+            System.err.println("Error deleting reports: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error("Failed to delete reports: " + e.getMessage()));
         }
     }
 
@@ -322,6 +410,46 @@ public class PelaporanController {
         } catch (MalformedURLException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    // Helper method to get user from token
+    private User getUserFromToken(String token) {
+        if (token == null || !token.startsWith("Bearer ")) {
+            return null;
+        }
+        try {
+            // Remove "Bearer " prefix
+            String tokenValue = token.substring(7);
+            
+            // Use JWTGenerator to get username from token
+            String username = jwtGenerator.getUsernameFromToken(tokenValue);
+            if (username == null) {
+                return null;
+            }
+            
+            // Find user by username
+            Optional<User> userOpt = userRepository.findByUsername(username);
+            return userOpt.orElse(null);
+        } catch (Exception e) {
+            System.err.println("Error parsing token: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // Helper method to check if user can modify report (owner or admin)
+    private boolean canModifyReport(ItemReport report, User user) {
+        if (user == null) {
+            return false;
+        }
+        // Admin can modify any report
+        if ("ADMIN".equals(user.getRole())) {
+            return true;
+        }
+        // User can only modify their own reports
+        if (report.getUser() != null && report.getUser().getId().equals(user.getId())) {
+            return true;
+        }
+        return false;
     }
 
     // Helper method to convert Entity to DTO
