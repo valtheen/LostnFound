@@ -3,6 +3,20 @@ package IPPL.LostnFound.dto;
 import java.time.LocalDate;
 
 public class ItemReportDTO {
+<<<<<<< HEAD
+
+    private Long id;
+    private String namaBarang;
+    private LocalDate tanggal;
+    private String keterangan;
+    private String namaPemilik;
+    private String lokasi;
+    private String noHandphone;
+    private String gambarPath;
+    private Long userId;
+    private String userEmail;
+
+=======
     private Long id;
     private String namaBarang;
     private LocalDate tanggal;
@@ -35,6 +49,7 @@ public class ItemReportDTO {
     }
 
     // Getters and Setters
+>>>>>>> devendev
     public Long getId() {
         return id;
     }
@@ -91,6 +106,8 @@ public class ItemReportDTO {
         this.noHandphone = noHandphone;
     }
 
+<<<<<<< HEAD
+=======
     public String getKategori() {
         return kategori;
     }
@@ -99,6 +116,7 @@ public class ItemReportDTO {
         this.kategori = kategori;
     }
 
+>>>>>>> devendev
     public String getGambarPath() {
         return gambarPath;
     }

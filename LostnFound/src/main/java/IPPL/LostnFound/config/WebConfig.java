@@ -1,16 +1,29 @@
 package IPPL.LostnFound.config;
 
+<<<<<<< HEAD
+=======
 import java.nio.file.Paths;
 
+>>>>>>> devendev
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+<<<<<<< HEAD
+import java.nio.file.Paths;
+
+=======
+>>>>>>> devendev
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+<<<<<<< HEAD
+        String uploadsPath = Paths.get("uploads").toAbsolutePath().toString();
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:" + uploadsPath + "/");
+=======
         // Get absolute path to uploads directory
         String uploadsPath = Paths.get("uploads").toAbsolutePath().toString();
         
@@ -22,6 +35,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("file:" + normalizedPath + "/");
         
         System.out.println("Static resource handler configured for uploads at: " + normalizedPath);
+>>>>>>> devendev
     }
 }
 

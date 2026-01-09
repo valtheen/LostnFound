@@ -2,6 +2,34 @@ package IPPL.LostnFound.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+<<<<<<< HEAD
+import jakarta.validation.constraints.Pattern;
+
+public class RegisterRequest {
+
+    @Email
+    @NotBlank
+    private String email;
+
+    @NotBlank
+    private String password;
+
+    @NotBlank
+    private String name;
+
+    @NotBlank
+    @Pattern(regexp = "\\d{10,13}", message = "Nomor telepon harus 10-13 digit")
+    private String phone;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+=======
 import jakarta.validation.constraints.Size;
 
 public class RegisterRequest {
@@ -44,6 +72,7 @@ public class RegisterRequest {
         this.username = username;
     }
 
+>>>>>>> devendev
     public String getPassword() {
         return password;
     }
@@ -52,12 +81,21 @@ public class RegisterRequest {
         this.password = password;
     }
 
+<<<<<<< HEAD
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+=======
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+>>>>>>> devendev
     }
 
     public String getPhone() {

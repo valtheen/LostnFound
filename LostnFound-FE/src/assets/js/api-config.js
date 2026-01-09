@@ -1,11 +1,16 @@
-// API Configuration
+// API Configuration - Use same host as current page
+const getApiBaseUrl = () => {
+    const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+    return `http://${hostname}:8080/api`;
+};
+
 const API_CONFIG = {
-    BASE_URL: 'http://localhost:8080/api',
+    BASE_URL: getApiBaseUrl(),
     ENDPOINTS: {
         // Authentication
-        REGISTER: '/users/register',
-        LOGIN: '/users/login',
-        LOGOUT: '/users/logout',
+        REGISTER: '/auth/register',
+        LOGIN: '/auth/login',
+        LOGOUT: '/auth/logout',
         
         // Items
         ITEMS: '/barang',
@@ -14,8 +19,11 @@ const API_CONFIG = {
         
         // Reports
         REPORTS: '/pelaporan',
+<<<<<<< HEAD
+=======
         REPORT_STATS: '/pelaporan/stats',
         RECENT_REPORTS: '/pelaporan/recent',
+>>>>>>> devendev
         
         // Users
         USER_PROFILE: '/users/profile',
